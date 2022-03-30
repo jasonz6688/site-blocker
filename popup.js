@@ -1,37 +1,69 @@
-function saveLinks () {
-    var links = [];
+function addUrlP(url) {
+    var entry = document.createElement("p");
+    entry.innerHTML = url;
+    entry.id = url;
+    document.getElementsByTagName("body")[0].appendChild(entry);
+}
 
-    chrome.tabs.query({ currentWindow: true }, function(tabs) {
-        tabs.forEach(function(tab) {
-            links.push(tab.url + "\n");
+function removeUrlP(url) {
+    var entry = document.getElementById(url);
+    document.getElementsByTagName("body")[0].removeChild(entry);
+}
+
+
+chrome.storage.sync.get(["urls"], function(result) {
+    for (const url of result.urls) {
+        addUrlP(url);
+    }
+});
+
+function addLink() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        let url = tabs[0].url;
+        chrome.storage.sync.get(["urls"], function(result) {
+            var urls = [];
+            if (result.urls) {
+                urls = result.urls;
+            }
+
+            if (!urls.includes(url)) {
+                urls.push(url);
+                addUrlP(url);
+                chrome.storage.sync.set({"urls": urls});
+            }
         });
-
-
-        links[links.length - 1] = links[links.length - 1].substring(0, links[links.length - 1].length - 1);
-
-        var blob = new Blob(links, { type: "text/plain" });
-        const cUrl = URL.createObjectURL(blob);
-        chrome.downloads.download({ url: cUrl, filename: "links.txt"});
     });
 }
 
-document.getElementById("Save").onclick = saveLinks;
+document.getElementById("Add").onclick = addLink;
 
 
-function openLinks() {
-    var fileToLoad = document.getElementById("toOpen").files[0];
-    var fileReader = new FileReader();
-    fileReader.onload = function(fileLoadedEvent) {
-        const incog = document.getElementById("incognito").checked;
-        const links = fileLoadedEvent.target.result.split("\n");
-        chrome.windows.create({ url: links, incognito: incog });
-    };
+function removeLink() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        let url = tabs[0].url;
+        chrome.storage.sync.get(["urls"], function(result) {
+            if (!result.urls) {
+                return;
+            }
 
-    if (fileToLoad) {
-        fileReader.readAsText(fileToLoad, "UTF-8");
-    } else {
-        console.log("No File Chosen");
-    }
+            var urls = result.urls;
+            const index = urls.indexOf(url);
+            if (index > -1) {
+                urls.splice(index, 1);
+                removeUrlP(url);
+                chrome.storage.sync.set({"urls": urls});
+            }
+        });
+    });
 }
 
-document.getElementById("Open").onclick = openLinks;
+document.getElementById("Remove").onclick = removeLink;
+
+
+document.getElementById("Clear").onclick = function() {
+    let children = document.getElementsByTagName("body")[0].getElementsByTagName("p");
+    while (children.length > 0) {
+        document.getElementsByTagName("body")[0].removeChild(children[0]);
+    }
+    chrome.storage.sync.set({"urls": []});
+}
