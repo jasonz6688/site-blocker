@@ -1,6 +1,6 @@
 {
-  "name": "QuickSave",
-  "description": "This extension quickly saves your window as a .txt file.",
+  "name": "site blocker",
+  "description": "This extension blocks sites you don't want to load anymore.",
   "version": "1.0",
   "manifest_version": 3,
 
@@ -16,14 +16,18 @@
   },
 
   "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-          "16": "/images/icon16.png",
-          "32": "/images/icon32.png",
-          "48": "/images/icon48.png",
-          "128": "/images/icon128.png"
-      }
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "/images/icon16.png",
+      "32": "/images/icon32.png",
+      "48": "/images/icon48.png",
+      "128": "/images/icon128.png"
+    }
   },
 
-  "permissions": [ "activeTab", "tabs", "downloads" ]
+  "permissions": [ "activeTab", "storage" ],
+  "content_scripts": [ {
+    "matches": [ "https://*/", "https://*/*" ],
+    "js": [ "content.js" ]
+  } ]
 }

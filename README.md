@@ -1,6 +1,6 @@
-# QuickSave
+# site blocker
 
-This extension quickly saves your window as a .txt file.
+This extension blocks sites you don't want to load anymore.
 
 ### Installing
 
