@@ -39,21 +39,19 @@ document.getElementById("Add").onclick = addLink;
 
 
 function removeLink() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        let url = tabs[0].url;
-        chrome.storage.sync.get(["urls"], function(result) {
-            if (!result.urls) {
-                return;
-            }
+    let url = document.getElementById("Site").value;
+    chrome.storage.sync.get(["urls"], function(result) {
+        if (!result.urls) {
+            return;
+        }
 
-            var urls = result.urls;
-            const index = urls.indexOf(url);
-            if (index > -1) {
-                urls.splice(index, 1);
-                removeUrlP(url);
-                chrome.storage.sync.set({"urls": urls});
-            }
-        });
+        var urls = result.urls;
+        const index = urls.indexOf(url);
+        if (index > -1) {
+            urls.splice(index, 1);
+            removeUrlP(url);
+            chrome.storage.sync.set({"urls": urls});
+        }
     });
 }
 
